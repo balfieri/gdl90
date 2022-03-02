@@ -495,6 +495,27 @@ bool GDL90::self_test( void )
     if ( !height_above_terrain_decode( unpacked, height ) ) return false;
     if ( !height_decode( height, height_f ) ) return false;
     if ( height_f != -32767.0 ) return false;
+
+    // OWNERSHIP_GEOMETRIC_ALTITUDE
+    real64 geo_altitude_f = -5*32765;
+    uint32_t geo_altitude;
+    bool vertical_warning = true;
+    real64 vertical_figure_of_merit_f = 32765;
+    uint32_t vertical_figure_of_merit;
+    if ( !geo_altitude_encode( geo_altitude, geo_altitude_f ) ) return false;
+    if ( !vertical_figure_of_merit_encode( vertical_figure_of_merit, vertical_figure_of_merit_f ) ) return false;
+    if ( !ownership_geometric_altitude_encode( unpacked, geo_altitude, vertical_warning, vertical_figure_of_merit ) ) return false;
+    if ( !pack( packed, unpacked ) ) return false;
+
+    if ( !unpack( unpacked, packed ) ) return false;
+    if ( !ownership_geometric_altitude_decode( unpacked, geo_altitude, vertical_warning, vertical_figure_of_merit ) ) return false;
+    if ( !geo_altitude_decode( geo_altitude, geo_altitude_f ) ) return false;
+    if ( !vertical_figure_of_merit_decode( vertical_figure_of_merit, vertical_figure_of_merit_f ) ) return false;
+    if ( geo_altitude_f != (-5*32765) ) return false;
+    if ( !vertical_warning ) return false;
+    if ( vertical_figure_of_merit_f != 32765 ) return false;
+
+    // PASSED
     return true;
 };
 
@@ -1065,6 +1086,7 @@ bool GDL90::geo_altitude_encode( uint32_t& geo_altitude_encoded, real64  geo_alt
 {
     if ( geo_altitude < (-5.0*32768.0) || geo_altitude > (5.0*32767.0) ) return false; 
     geo_altitude_encoded = geo_altitude / 5.0 + ((geo_altitude < 0.0) ? -0.5 : 0.5);
+    geo_altitude_encoded &= 0xffff;
     return true;
 }
 
