@@ -12,8 +12,8 @@ The GDL90 spec can be found here: https://www.faa.gov/nextgen/programs/adsb/Arch
 This header file currently implements only what is in section 3, plus Foreflight extensions.
 Sections 4, 5, and 6 will be filled in based on demand (feel free to help).
 
-ForeFlight has GDL90 extensions discussed here: https://www.foreflight.com/connect/spec/
-They are fully supported by this header file.
+The ForeFlight GDL90 extensions are discussed here: https://www.foreflight.com/connect/spec/.
+They are fully supported by this header file. There are currently two ForeFlight-specific messages.
 
 After instantiating this class, it is highly recommended that you call
 the self_test() method and check that the return value is true.
