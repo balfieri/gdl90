@@ -8,13 +8,12 @@ problems if you use a much early C++ standard.
 This file does NOT send or receive messages or perform any network discovery.
 That is left to your application.
 
-The GDL90 spec can be found here: https://www.faa.gov/nextgen/programs/adsb/Archival/media/GDL90_Public_ICD_RevA.PDF
-Relevant sections of the spec are noted in comments below.
-This file currently implements only what is in section 3, plus Foreflight extensions.
+The GDL90 spec can be found here: https://www.faa.gov/nextgen/programs/adsb/Archival/media/GDL90_Public_ICD_RevA.PDF.
+This header file currently implements only what is in section 3, plus Foreflight extensions.
 Sections 4, 5, and 6 will be filled in based on demand (feel free to help).
 
 ForeFlight has GDL90 extensions discussed here: https://www.foreflight.com/connect/spec/
-They are fully supported by this file.
+They are fully supported by this header file.
 
 After instantiating this class, it is highly recommended that you call
 the self_test() method and check that the return value is true.
