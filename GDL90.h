@@ -20,6 +20,9 @@
 // 
 // GDL90.h - single header file implementing GDL90 message encoding and decoding 
 //
+// Note: I always compile with the -std=c++17 option. You may encounter
+//       problems if you use a much early C++ standard.
+//
 // This file does NOT send or receive messages or perform any network discovery.
 // That is left to your application.
 //
@@ -57,6 +60,7 @@
 #define _GDL90_h
 
 #include <cstdint>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -147,8 +151,8 @@ public:
 
     // UPLINK_DATA, BASIC_UAT_REPORT, LONG_UAT_REPORT
     static constexpr uint32_t TIME_OF_RECEPTION_FRAC_ENCODED_INVALID = 0xffffff;
-    bool     time_of_reception_frac_encode( uint32_t& frac_encoded, real64  frac );  // frac is fractions of a second since the heartbeat timestamp
-    bool     time_of_reception_frac_decode( uint32_t  frac_encoded, real64& frac );  // frac set to NaN  if frac_encoded==TIME_OF_RECEPTION_FRAC_ENCODED_INVALID
+    bool     time_of_reception_frac_encode( uint32_t& frac_encoded, double  frac );  // frac is fractions of a second since the heartbeat timestamp
+    bool     time_of_reception_frac_decode( uint32_t  frac_encoded, double& frac );  // frac set to NaN  if frac_encoded==TIME_OF_RECEPTION_FRAC_ENCODED_INVALID
 
     bool     uplink_data_encode(       RawBytes& unpacked, uint32_t  time_of_reception_frac, const RawBytes& payload );
     bool     uplink_data_decode( const RawBytes& unpacked, uint32_t& time_of_reception_frac,       RawBytes& payload );
@@ -259,23 +263,23 @@ public:
         __LAST                  = 6,
     };
 
-    bool     latlon_encode( uint32_t& latlon_encoded, real64  latlon );  // latlon must be -180.0 .. 180.0(minus LSB epsilon); north and east are considered positive
-    bool     latlon_decode( uint32_t  latlon_encoded, real64& latlon );  
+    bool     latlon_encode( uint32_t& latlon_encoded, double  latlon );  // latlon must be -180.0 .. 180.0(minus LSB epsilon); north and east are considered positive
+    bool     latlon_decode( uint32_t  latlon_encoded, double& latlon );  
 
     static constexpr uint32_t ALTITUDE_ENCODED_INVALID                = 0xfff;  
-    bool     altitude_encode( uint32_t& altitude_encoded, real64  altitude );  // altitude must be -1000 ft to +101,350 ft
-    bool     altitude_decode( uint32_t  altitude_encoded, real64& altitude );  // altitude is set to NaN if altitude_encoded==ALTITUDE_ENCODED_INVALID
+    bool     altitude_encode( uint32_t& altitude_encoded, double  altitude );  // altitude must be -1000 ft to +101,350 ft
+    bool     altitude_decode( uint32_t  altitude_encoded, double& altitude );  // altitude is set to NaN if altitude_encoded==ALTITUDE_ENCODED_INVALID
 
     static constexpr uint32_t HORIZONTAL_VELOCITY_ENCODED_INVALID          = 0xfff;  
-    bool     horizontal_velocity_encode( uint32_t& velocity_encoded, real64  velocity );  // valid range is 0 .. 4094 ft; if exceeded, then it is hammered to 4094
-    bool     horizontal_velocity_decode( uint32_t  velocity_encoded, real64& velocity );  // velocity is set to NaN if velocity_encoded==HORIZONTAL_VELOCITY_ENCODED_INVALID
+    bool     horizontal_velocity_encode( uint32_t& velocity_encoded, double  velocity );  // valid range is 0 .. 4094 ft; if exceeded, then it is hammered to 4094
+    bool     horizontal_velocity_decode( uint32_t  velocity_encoded, double& velocity );  // velocity is set to NaN if velocity_encoded==HORIZONTAL_VELOCITY_ENCODED_INVALID
 
     static constexpr uint32_t VERTICAL_VELOCITY_ENCODED_INVALID          = 0x800;
-    bool     vertical_velocity_encode( uint32_t& velocity_encoded, real64  velocity );  // valid range is +/- 32,576 ft; if exceeded, then it is hammered to +/- 32,640
-    bool     vertical_velocity_decode( uint32_t  velocity_encoded, real64& velocity );  // velocity is set to NaN if velocity_encoded==VERTICAL_VELOCITY_ENCODED_INVALID
+    bool     vertical_velocity_encode( uint32_t& velocity_encoded, double  velocity );  // valid range is +/- 32,576 ft; if exceeded, then it is hammered to +/- 32,640
+    bool     vertical_velocity_decode( uint32_t  velocity_encoded, double& velocity );  // velocity is set to NaN if velocity_encoded==VERTICAL_VELOCITY_ENCODED_INVALID
 
-    bool     track_hdg_encode( uint32_t& track_hdg_encoded, real64  track_hdg );        // valid range is 0-360 deg
-    bool     track_hdg_decode( uint32_t  track_hdg_encoded, real64& track_hdg );        
+    bool     track_hdg_encode( uint32_t& track_hdg_encoded, double  track_hdg );        // valid range is 0-360 deg
+    bool     track_hdg_decode( uint32_t  track_hdg_encoded, double& track_hdg );        
 
     bool     is_valid_call_sign( std::string call_sign );
 
@@ -290,20 +294,20 @@ public:
 
     // HEIGHT_ABOVE_TERRAIN
     static constexpr uint32_t HEIGHT_ENCODED_INVALID = 0x80000;
-    bool     height_encode( uint32_t& height_encoded, real64  height );  // height must be -32767 .. 32767; if NaN, height_encoded is set to HEIGHT_ENCODED_INVALID
-    bool     height_decode( uint32_t  height_encoded, real64& height );  // height is set to NaN if height_encoded==HEIGHT_ENCODED_INVALID
+    bool     height_encode( uint32_t& height_encoded, double  height );  // height must be -32767 .. 32767; if NaN, height_encoded is set to HEIGHT_ENCODED_INVALID
+    bool     height_decode( uint32_t  height_encoded, double& height );  // height is set to NaN if height_encoded==HEIGHT_ENCODED_INVALID
 
     bool     height_above_terrain_encode(       RawBytes& unpacked, uint32_t  height );  
     bool     height_above_terrain_decode( const RawBytes& unpacked, uint32_t& height );  
     
     // OWNERSHIP_GEOMETRIC_ALTITUDE
-    bool     geo_altitude_encode( uint32_t& geo_altitude_encoded, real64  geo_altitude );  // geo_altitude must be -5*32768 .. 5*32767; 
-    bool     geo_altitude_decode( uint32_t  geo_altitude_encoded, real64& geo_altitude );  
+    bool     geo_altitude_encode( uint32_t& geo_altitude_encoded, double  geo_altitude );  // geo_altitude must be -5*32768 .. 5*32767; 
+    bool     geo_altitude_decode( uint32_t  geo_altitude_encoded, double& geo_altitude );  
 
     static constexpr uint32_t VERTICAL_FIGURE_OF_MERIT_NOT_AVAIL = 0x7fff;
     static constexpr uint32_t VERTICAL_FIGURE_OF_MERIT_GE_32766  = 0x7ffe;
-    bool     vertical_figure_of_merit_encode( uint32_t& vertical_figure_of_merit_encoded, real64  vertical_figure_of_merit ); // must be in meters and >= 0; NaN => NOT_AVAIL
-    bool     vertical_figure_of_merit_decode( uint32_t  vertical_figure_of_merit_encoded, real64& vertical_figure_of_merit ); // set to NaN if VERTICAL_FIGURE_OF_MERIT_NOT_AVAIL
+    bool     vertical_figure_of_merit_encode( uint32_t& vertical_figure_of_merit_encoded, double  vertical_figure_of_merit ); // must be in meters and >= 0; NaN => NOT_AVAIL
+    bool     vertical_figure_of_merit_decode( uint32_t  vertical_figure_of_merit_encoded, double& vertical_figure_of_merit ); // set to NaN if VERTICAL_FIGURE_OF_MERIT_NOT_AVAIL
 
     bool     ownership_geometric_altitude_encode(       RawBytes& unpacked, uint32_t  geo_altitude, bool  vertical_warning, uint32_t  vertical_figure_of_merit );
     bool     ownership_geometric_altitude_decode( const RawBytes& unpacked, uint32_t& geo_altitude, bool& vertical_warning, uint32_t& vertical_figure_of_merit );
@@ -356,7 +360,7 @@ bool GDL90::self_test( void )
     if ( config != (INIT_CONFIG_ALLOWED_MASK & 0xaa55) ) return false;
 
     // UPLINK_DATA
-    real64   time_of_reception_frac_f = 0.99999992;
+    double   time_of_reception_frac_f = 0.99999992;
     uint32_t time_of_reception_frac;
     if ( !time_of_reception_frac_encode( time_of_reception_frac, time_of_reception_frac_f ) ) return false;
     if ( !time_of_reception_frac_decode( time_of_reception_frac, time_of_reception_frac_f ) ) return false;
@@ -429,15 +433,15 @@ bool GDL90::self_test( void )
     ALERT_STATUS   alert_status = ALERT_STATUS::__LAST;
     ADDR_TYPE      addr_type = ADDR_TYPE::__LAST;
     uint32_t       participant_address = 0xffaa55;
-    real64         latitude_f = -179.2255;
-    real64         longitude_f = +179.4357; 
-    real64         altitude_f = 101349;
+    double         latitude_f = -179.2255;
+    double         longitude_f = +179.4357; 
+    double         altitude_f = 101349;
     uint32_t       misc = MISC_ALLOWED_MASK;
     NIC            nic = NIC::__LAST;
     NACP           nacp = NACP::__LAST;
-    real64         horiz_velocity_f = 125.4462;
-    real64         vert_velocity_f = -800.333;
-    real64         track_hdg_f = 358.3674;
+    double         horiz_velocity_f = 125.4462;
+    double         vert_velocity_f = -800.333;
+    double         track_hdg_f = 358.3674;
     EMITTER        emitter = EMITTER::__LAST;
     std::string    call_sign = "N53587";
     EMERGENCY_PRIO emergency_prio_code = EMERGENCY_PRIO::__LAST;
@@ -485,7 +489,7 @@ bool GDL90::self_test( void )
     if ( emergency_prio_code != EMERGENCY_PRIO::__LAST ) return false;
 
     // HEIGHT_ABOVE_TERRAIN
-    real64 height_f = -32767.0;
+    double height_f = -32767.0;
     uint32_t height;
     if ( !height_encode( height, height_f ) ) return false;
     if ( !height_above_terrain_encode( unpacked, height ) ) return false;
@@ -497,10 +501,10 @@ bool GDL90::self_test( void )
     if ( height_f != -32767.0 ) return false;
 
     // OWNERSHIP_GEOMETRIC_ALTITUDE
-    real64 geo_altitude_f = -5*32765;
+    double geo_altitude_f = -5*32765;
     uint32_t geo_altitude;
     bool vertical_warning = true;
-    real64 vertical_figure_of_merit_f = 32765;
+    double vertical_figure_of_merit_f = 32765;
     uint32_t vertical_figure_of_merit;
     if ( !geo_altitude_encode( geo_altitude, geo_altitude_f ) ) return false;
     if ( !vertical_figure_of_merit_encode( vertical_figure_of_merit, vertical_figure_of_merit_f ) ) return false;
@@ -699,7 +703,7 @@ bool GDL90::initialization_decode( const RawBytes& unpacked, uint32_t& config )
     return true;
 }
 
-bool GDL90::time_of_reception_frac_encode( uint32_t& frac_encoded, real64  frac ) 
+bool GDL90::time_of_reception_frac_encode( uint32_t& frac_encoded, double  frac ) 
 {
     if ( std::isnan( frac ) ) {
         frac_encoded = TIME_OF_RECEPTION_FRAC_ENCODED_INVALID;
@@ -710,13 +714,13 @@ bool GDL90::time_of_reception_frac_encode( uint32_t& frac_encoded, real64  frac 
     return true;
 }
 
-bool GDL90::time_of_reception_frac_decode( uint32_t  frac_encoded, real64& frac )
+bool GDL90::time_of_reception_frac_decode( uint32_t  frac_encoded, double& frac )
 {
     if ( frac_encoded > 0xffffff ) return false;
     if ( frac_encoded == TIME_OF_RECEPTION_FRAC_ENCODED_INVALID ) {
         frac = std::nanf("0");
     } else {
-        frac = real64(frac_encoded) * 80.0/1000000000.0;
+        frac = double(frac_encoded) * 80.0/1000000000.0;
         if ( frac >= 1.0 ) return false;
     }
     return true;
@@ -818,24 +822,24 @@ bool GDL90::long_uat_report_decode( const RawBytes& unpacked, uint32_t& time_of_
     return true;
 }
 
-bool GDL90::latlon_encode( uint32_t& latlon_encoded, real64  latlon )
+bool GDL90::latlon_encode( uint32_t& latlon_encoded, double  latlon )
 {
     if ( latlon < -180.0 || latlon >= 180.0 ) return false;
-    latlon_encoded = latlon*real64( 1 << 23 )/180.0 + ((latlon >= 0.0) ? 0.5 : -0.5);
+    latlon_encoded = latlon*double( 1 << 23 )/180.0 + ((latlon >= 0.0) ? 0.5 : -0.5);
     latlon_encoded &= 0xffffff;
     if ( latlon >= 0.0 && latlon_encoded >= 0x800000 ) return false;
     if ( latlon <  0.0 && latlon_encoded <  0x800000 ) return false;
     return true;
 }
 
-bool GDL90::latlon_decode( uint32_t latlon_encoded, real64& latlon )
+bool GDL90::latlon_decode( uint32_t latlon_encoded, double& latlon )
 {
     int32_t latlon_encoded_s = latlon_encoded | ((latlon_encoded >= 0x800000) ? 0xff000000 : 0x00000000);
-    latlon = real64(latlon_encoded_s) * 180.0/real64(1 << 23);
+    latlon = double(latlon_encoded_s) * 180.0/double(1 << 23);
     return true;
 }
 
-bool GDL90::altitude_encode( uint32_t& altitude_encoded, real64 altitude )
+bool GDL90::altitude_encode( uint32_t& altitude_encoded, double altitude )
 {
     if ( std::isnan( altitude ) ) {
         altitude_encoded = ALTITUDE_ENCODED_INVALID;
@@ -847,7 +851,7 @@ bool GDL90::altitude_encode( uint32_t& altitude_encoded, real64 altitude )
     return true;
 }
 
-bool GDL90::altitude_decode( uint32_t  altitude_encoded, real64& altitude )
+bool GDL90::altitude_decode( uint32_t  altitude_encoded, double& altitude )
 {
     if ( altitude_encoded > 0xfff ) return false;
     if ( altitude_encoded == ALTITUDE_ENCODED_INVALID ) {
@@ -858,7 +862,7 @@ bool GDL90::altitude_decode( uint32_t  altitude_encoded, real64& altitude )
     return true;
 }
 
-bool GDL90::horizontal_velocity_encode( uint32_t& velocity_encoded, real64  velocity )
+bool GDL90::horizontal_velocity_encode( uint32_t& velocity_encoded, double  velocity )
 {
     if ( std::isnan( velocity ) ) {
         velocity_encoded = HORIZONTAL_VELOCITY_ENCODED_INVALID;
@@ -872,7 +876,7 @@ bool GDL90::horizontal_velocity_encode( uint32_t& velocity_encoded, real64  velo
     return true;
 }
 
-bool GDL90::horizontal_velocity_decode( uint32_t velocity_encoded, real64& velocity )
+bool GDL90::horizontal_velocity_decode( uint32_t velocity_encoded, double& velocity )
 {
     if ( velocity_encoded == VERTICAL_VELOCITY_ENCODED_INVALID ) {
         velocity = std::nanf("3");
@@ -882,7 +886,7 @@ bool GDL90::horizontal_velocity_decode( uint32_t velocity_encoded, real64& veloc
     return true;
 }
 
-bool GDL90::vertical_velocity_encode( uint32_t& velocity_encoded, real64  velocity )
+bool GDL90::vertical_velocity_encode( uint32_t& velocity_encoded, double  velocity )
 {
     if ( std::isnan( velocity ) ) {
         velocity_encoded = VERTICAL_VELOCITY_ENCODED_INVALID;
@@ -897,19 +901,19 @@ bool GDL90::vertical_velocity_encode( uint32_t& velocity_encoded, real64  veloci
     return true;
 }
 
-bool GDL90::vertical_velocity_decode( uint32_t velocity_encoded, real64& velocity )
+bool GDL90::vertical_velocity_decode( uint32_t velocity_encoded, double& velocity )
 {
     if ( velocity_encoded == VERTICAL_VELOCITY_ENCODED_INVALID ) {
         velocity = std::nanf("4");
     } else {
         if ( (velocity_encoded >= 0x1ff && velocity_encoded <= 0x7ff) || (velocity_encoded >= 0x801 && velocity_encoded <= 0xe01) ) return false;
         int32_t velocity_encoded_s = velocity_encoded | ((velocity_encoded >= 0x801) ? 0xfffff000 : 0x00000000);
-        velocity = real64(velocity_encoded_s) * 64.0;
+        velocity = double(velocity_encoded_s) * 64.0;
     }
     return true;
 }
 
-bool GDL90::track_hdg_encode( uint32_t& track_hdg_encoded, real64  track_hdg )
+bool GDL90::track_hdg_encode( uint32_t& track_hdg_encoded, double  track_hdg )
 {
     if ( track_hdg < 0.0 || track_hdg > 360.0 ) return false;
     track_hdg_encoded = track_hdg * 256.0/360.0 + 0.5;
@@ -917,9 +921,9 @@ bool GDL90::track_hdg_encode( uint32_t& track_hdg_encoded, real64  track_hdg )
     return true;
 }
 
-bool GDL90::track_hdg_decode( uint32_t  track_hdg_encoded, real64& track_hdg )
+bool GDL90::track_hdg_decode( uint32_t  track_hdg_encoded, double& track_hdg )
 {
-    track_hdg = real64(track_hdg_encoded) * 360.0 / 256.0;
+    track_hdg = double(track_hdg_encoded) * 360.0 / 256.0;
     return true;
 }
 
@@ -987,7 +991,6 @@ bool GDL90::ownership_or_traffic_report_encode( RawBytes& unpacked, bool is_owne
         unpacked.push_back( ch );
     }
     unpacked.push_back( uint8_t(emergency_prio_code) << 4 );
-    dassert( unpacked.size() == 28, "something is wrong" );
     return true;
 }
 
@@ -1035,11 +1038,10 @@ bool GDL90::ownership_or_traffic_report_decode( const RawBytes& unpacked, bool i
     }
     byte = unpacked[i++];
     emergency_prio_code = EMERGENCY_PRIO( (byte >> 4) & 0xf );
-    dassert( i == 28, "something is wrong i=" + std::to_string(i) );
     return true;
 }
 
-bool GDL90::height_encode( uint32_t& height_encoded, real64  height )
+bool GDL90::height_encode( uint32_t& height_encoded, double  height )
 {
     if ( std::isnan( height ) ) {
         height_encoded = HEIGHT_ENCODED_INVALID;
@@ -1051,7 +1053,7 @@ bool GDL90::height_encode( uint32_t& height_encoded, real64  height )
     return true;
 }
 
-bool GDL90::height_decode( uint32_t height_encoded, real64& height )
+bool GDL90::height_decode( uint32_t height_encoded, double& height )
 {
     if ( height_encoded == HEIGHT_ENCODED_INVALID ) {
         height = std::nanf("4");
@@ -1082,7 +1084,7 @@ bool GDL90::height_above_terrain_decode( const RawBytes& unpacked, uint32_t& hei
     return true;
 }
 
-bool GDL90::geo_altitude_encode( uint32_t& geo_altitude_encoded, real64  geo_altitude )
+bool GDL90::geo_altitude_encode( uint32_t& geo_altitude_encoded, double  geo_altitude )
 {
     if ( geo_altitude < (-5.0*32768.0) || geo_altitude > (5.0*32767.0) ) return false; 
     geo_altitude_encoded = geo_altitude / 5.0 + ((geo_altitude < 0.0) ? -0.5 : 0.5);
@@ -1090,14 +1092,14 @@ bool GDL90::geo_altitude_encode( uint32_t& geo_altitude_encoded, real64  geo_alt
     return true;
 }
 
-bool GDL90::geo_altitude_decode( uint32_t  geo_altitude_encoded, real64& geo_altitude )
+bool GDL90::geo_altitude_decode( uint32_t  geo_altitude_encoded, double& geo_altitude )
 {
     int32_t geo_altitude_encoded_s = geo_altitude_encoded | ((geo_altitude_encoded >= 0x8000) ? 0xffff0000 : 0x00000000);
-    geo_altitude = real64(geo_altitude_encoded_s) * 5.0;
+    geo_altitude = double(geo_altitude_encoded_s) * 5.0;
     return true;
 }
 
-bool GDL90::vertical_figure_of_merit_encode( uint32_t& vertical_figure_of_merit_encoded, real64  vertical_figure_of_merit )
+bool GDL90::vertical_figure_of_merit_encode( uint32_t& vertical_figure_of_merit_encoded, double  vertical_figure_of_merit )
 {
     if ( std::isnan( vertical_figure_of_merit ) ) {
         vertical_figure_of_merit_encoded = VERTICAL_FIGURE_OF_MERIT_NOT_AVAIL;
@@ -1113,7 +1115,7 @@ bool GDL90::vertical_figure_of_merit_encode( uint32_t& vertical_figure_of_merit_
     return true;
 }
 
-bool GDL90::vertical_figure_of_merit_decode( uint32_t  vertical_figure_of_merit_encoded, real64& vertical_figure_of_merit )
+bool GDL90::vertical_figure_of_merit_decode( uint32_t  vertical_figure_of_merit_encoded, double& vertical_figure_of_merit )
 {
     if ( vertical_figure_of_merit_encoded > 0x7fff ) return false;
     if ( vertical_figure_of_merit_encoded == VERTICAL_FIGURE_OF_MERIT_NOT_AVAIL ) {
