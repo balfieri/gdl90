@@ -1,10 +1,42 @@
 GDL90 Encode/Decode for Aviation Devices and Software
 
-This is a single header file to help encode/decode standard GDL90 messages. It does not do the actual sending and receiving of the datagrams. That's up to you.
+This is a single header file to help encode/decode standard GDL90 messages.
 
-See the comments at the top of GDL90.h for more discussion of the functionality and any limitations.
+Note: I always compile with the -std=c++17 option. You may encounter
+problems if you use a much early C++ standard.
 
-The best place to find examples of usage is the GDL90::self_test() method, which tests all implemented functionality.
+This file does NOT send or receive messages or perform any network discovery.
+That is left to your application.
+
+The GDL90 spec can be found here: https://www.faa.gov/nextgen/programs/adsb/Archival/media/GDL90_Public_ICD_RevA.PDF
+Relevant sections of the spec are noted in comments below.
+This file currently implements only what is in section 3, plus Foreflight extensions.
+Sections 4, 5, and 6 will be filled in based on demand (feel free to help).
+
+ForeFlight has GDL90 extensions discussed here: https://www.foreflight.com/connect/spec/
+They are fully supported by this file.
+
+After instantiating this class, it is highly recommended that you call
+the self_test() method and check that the return value is true.
+The self_test() method is also a good place to look for examples of usage.
+
+Typically one encodes a message using its encode() method, 
+then packs() it to prepare it for sending. The packing adds escape sequences,
+CRC, and start/end delimeters. The packed message is typically sent by the caller
+as a UDP datagram.
+
+Upon receipt (e.g., of a UDP datagram), one unpacks() the message, then calls 
+id_decode() to determine which MESSAGE_ID has been received, then calls the 
+appropriate decode() method.
+
+Some message fields are complicated, so there are additional encode/decode
+methods dedicated to converting to/from "normal" values into the encodings
+expected by GDL90.
+
+All methods return a bool indicating whether the inputs were legal and
+the method was fully performed. If the inputs are not legal, it does not currently
+tell you why - you'll need to use the debugger to step through the method.
+For received illegal messages, one typically drops the message silently.
 
 This is all open source. See the LICENSE.md (MIT) file for details.
 
