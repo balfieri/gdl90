@@ -34,8 +34,8 @@ expected by GDL90.
 
 All methods return a bool indicating whether the inputs were legal and
 the method was fully performed. If the inputs are not legal, it does not currently
-tell you why - you'll need to use the debugger to step through the method.
-For received illegal messages, one typically drops the message silently.
+tell you why, but you can set a breakpoint at GDL90::error() and see where it died.
+You can also set the abort_on_error flag to have it die immediately.
 
 This is all open source. See the LICENSE.md (MIT) file for details.
 
